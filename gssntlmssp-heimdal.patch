@@ -1,0 +1,263 @@
+--- gssntlmssp-0.7.0/configure.ac.orig	2016-05-23 17:33:43.679657492 +0200
++++ gssntlmssp-0.7.0/configure.ac	2019-03-06 21:19:51.059548400 +0100
+@@ -76,10 +76,10 @@
+     GSSAPI_CFLAGS="`$KRB5_CONFIG --cflags gssapi`"
+     GSSAPI_LIBS="`$KRB5_CONFIG --libs gssapi`"
+ fi
+-AC_CHECK_LIB(gssapi_krb5, gss_import_cred,,
++AC_CHECK_LIB(gssapi, gss_import_cred,,
+              [AC_MSG_ERROR([GSSAPI library does not support gss_import_cred])],
+              [$GSSAPI_LIBS])
+-AC_CHECK_LIB(gssapi_krb5, gss_export_cred,,
++AC_CHECK_LIB(gssapi, gss_export_cred,,
+              [AC_MSG_ERROR([GSSAPI library does not support gss_export_cred])],
+              [$GSSAPI_LIBS])
+ 
+--- gssntlmssp-0.7.0/src/gss_err.c.orig	2016-05-23 17:33:43.683657469 +0200
++++ gssntlmssp-0.7.0/src/gss_err.c	2019-03-11 09:50:24.093307653 +0100
+@@ -7,7 +7,6 @@
+ #include <errno.h>
+ 
+ #include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_ext.h>
+ 
+ #include "gss_ntlmssp.h"
+ 
+--- gssntlmssp-0.7.0/src/gssapi_ntlmssp.h.orig	2016-06-03 16:28:17.865974253 +0200
++++ gssntlmssp-0.7.0/src/gssapi_ntlmssp.h	2019-03-11 09:50:55.599803635 +0100
+@@ -19,7 +19,6 @@
+ #define _GSSAPI_NTLMSSP_H_
+ 
+ #include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_ext.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {
+--- gssntlmssp-0.7.0/src/gss_creds.c.orig	2016-05-23 17:33:43.683657469 +0200
++++ gssntlmssp-0.7.0/src/gss_creds.c	2019-03-11 18:41:53.940545522 +0100
+@@ -21,7 +21,6 @@
+ #include <string.h>
+ 
+ #include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_ext.h>
+ 
+ #include "gss_ntlmssp.h"
+ 
+--- gssntlmssp-0.7.0/src/gss_spi.c.orig	2016-05-23 17:33:43.685657457 +0200
++++ gssntlmssp-0.7.0/src/gss_spi.c	2019-03-11 19:02:57.233701676 +0100
+@@ -16,19 +16,18 @@
+ */
+ 
+ #include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_ext.h>
+ 
+ #include "gss_ntlmssp.h"
+ 
+ OM_uint32 gss_init_sec_context(OM_uint32 *minor_status,
+-                               gss_cred_id_t claimant_cred_handle,
++                               gss_const_cred_id_t claimant_cred_handle,
+                                gss_ctx_id_t *context_handle,
+-                               gss_name_t target_name,
+-                               gss_OID mech_type,
++                               gss_const_name_t target_name,
++                               const gss_OID mech_type,
+                                OM_uint32 req_flags,
+                                OM_uint32 time_req,
+-                               gss_channel_bindings_t input_chan_bindings,
+-                               gss_buffer_t input_token,
++                               const gss_channel_bindings_t input_chan_bindings,
++                               const gss_buffer_t input_token,
+                                gss_OID *actual_mech_type,
+                                gss_buffer_t output_token,
+                                OM_uint32 *ret_flags,
+@@ -80,9 +79,9 @@
+ }
+ 
+ OM_uint32 gss_acquire_cred(OM_uint32 *minor_status,
+-                           gss_name_t desired_name,
++                           gss_const_name_t desired_name,
+                            OM_uint32 time_req,
+-                           gss_OID_set desired_mechs,
++                           const gss_OID_set desired_mechs,
+                            gss_cred_usage_t cred_usage,
+                            gss_cred_id_t *output_cred_handle,
+                            gss_OID_set *actual_mechs,
+@@ -149,7 +148,7 @@
+ }
+ 
+ OM_uint32 gss_duplicate_name(OM_uint32 *minor_status,
+-                            const gss_name_t input_name,
++                            gss_const_name_t input_name,
+                             gss_name_t *dest_name)
+ {
+     return gssntlm_duplicate_name(minor_status,
+@@ -164,7 +163,7 @@
+ }
+ 
+ OM_uint32 gss_context_time(OM_uint32 *minor_status,
+-                           gss_ctx_id_t context_handle,
++                           gss_const_ctx_id_t context_handle,
+                            OM_uint32 *time_rec)
+ {
+     return gssntlm_context_time(minor_status, context_handle, time_rec);
+@@ -172,7 +171,7 @@
+ 
+ OM_uint32 gss_accept_sec_context(OM_uint32 *minor_status,
+                                  gss_ctx_id_t *context_handle,
+-                                 gss_cred_id_t acceptor_cred_handle,
++                                 gss_const_cred_id_t acceptor_cred_handle,
+                                  gss_buffer_t input_token_buffer,
+                                  gss_channel_bindings_t input_chan_bindings,
+                                  gss_name_t *src_name,
+@@ -196,9 +195,9 @@
+ }
+ 
+ OM_uint32 gss_get_mic(OM_uint32 *minor_status,
+-                      gss_ctx_id_t context_handle,
++                      gss_const_ctx_id_t context_handle,
+                       gss_qop_t qop_req,
+-                      gss_buffer_t message_buffer,
++                      const gss_buffer_t message_buffer,
+                       gss_buffer_t message_token)
+ {
+     return gssntlm_get_mic(minor_status,
+@@ -210,9 +209,9 @@
+ 
+ 
+ OM_uint32 gss_verify_mic(OM_uint32 *minor_status,
+-                         gss_ctx_id_t context_handle,
+-                         gss_buffer_t message_buffer,
+-                         gss_buffer_t message_token,
++                         gss_const_ctx_id_t context_handle,
++                         const gss_buffer_t message_buffer,
++                         const gss_buffer_t message_token,
+                          gss_qop_t *qop_state)
+ {
+     return gssntlm_verify_mic(minor_status,
+@@ -223,10 +222,10 @@
+ }
+ 
+ OM_uint32 gss_wrap(OM_uint32 *minor_status,
+-                   gss_ctx_id_t context_handle,
++                   gss_const_ctx_id_t context_handle,
+                    int conf_req_flag,
+                    gss_qop_t qop_req,
+-                   gss_buffer_t input_message_buffer,
++                   const gss_buffer_t input_message_buffer,
+                    int *conf_state,
+                    gss_buffer_t output_message_buffer)
+ {
+@@ -240,8 +239,8 @@
+ }
+ 
+ OM_uint32 gss_unwrap(OM_uint32 *minor_status,
+-                     gss_ctx_id_t context_handle,
+-                     gss_buffer_t input_message_buffer,
++                     gss_const_ctx_id_t context_handle,
++                     const gss_buffer_t input_message_buffer,
+                      gss_buffer_t output_message_buffer,
+                      int *conf_state,
+                      gss_qop_t *qop_state)
+@@ -255,7 +254,7 @@
+ }
+ 
+ OM_uint32 gss_wrap_size_limit(OM_uint32 *minor_status,
+-                              gss_ctx_id_t context_handle,
++                              gss_const_ctx_id_t context_handle,
+                               int conf_req_flag,
+                               gss_qop_t qop_req,
+                               OM_uint32 req_output_size,
+@@ -270,7 +269,7 @@
+ }
+ 
+ OM_uint32 gss_inquire_context(OM_uint32 *minor_status,
+-                              gss_ctx_id_t context_handle,
++                              gss_const_ctx_id_t context_handle,
+                               gss_name_t *src_name,
+                               gss_name_t *targ_name,
+                               OM_uint32 *lifetime_rec,
+@@ -291,7 +290,7 @@
+ }
+ 
+ OM_uint32 gss_display_name(OM_uint32 *minor_status,
+-                           gss_name_t input_name,
++                           gss_const_name_t input_name,
+                            gss_buffer_t output_name_buffer,
+                            gss_OID *output_name_type)
+ {
+@@ -302,8 +301,8 @@
+ }
+ 
+ OM_uint32 gss_localname(OM_uint32 *minor_status,
+-	                const gss_name_t name,
+-	                gss_const_OID mech_type,
++	                gss_const_name_t name,
++	                const gss_OID mech_type,
+ 	                gss_buffer_t localname)
+ {
+     return gssntlm_localname(minor_status,
+@@ -324,7 +323,7 @@
+ }
+ 
+ OM_uint32 gss_inquire_sec_context_by_oid(OM_uint32 *minor_status,
+-	                                 const gss_ctx_id_t context_handle,
++	                                 gss_const_ctx_id_t context_handle,
+ 	                                 const gss_OID desired_object,
+ 	                                 gss_buffer_set_t *data_set)
+ {
+@@ -335,7 +334,7 @@
+ }
+ 
+ OM_uint32 gss_inquire_cred(OM_uint32 *minor_status,
+-                           gss_cred_id_t cred_handle,
++                           gss_const_cred_id_t cred_handle,
+                            gss_name_t *name,
+                            OM_uint32 *lifetime,
+                            gss_cred_usage_t *cred_usage,
+@@ -350,8 +349,8 @@
+ }
+ 
+ OM_uint32 gss_inquire_cred_by_mech(OM_uint32 *minor_status,
+-                                   gss_cred_id_t cred_handle,
+-                                   gss_OID mech_type,
++                                   gss_const_cred_id_t cred_handle,
++                                   const gss_OID mech_type,
+                                    gss_name_t *name,
+                                    OM_uint32 *initiator_lifetime,
+                                    OM_uint32 *acceptor_lifetime,
+--- gssntlmssp-0.7.0/src/gss_names.c.orig	2016-05-23 17:33:43.683657469 +0200
++++ gssntlmssp-0.7.0/src/gss_names.c	2019-03-11 19:30:57.317933212 +0100
+@@ -28,7 +28,6 @@
+ #include <unistd.h>
+ 
+ #include <gssapi/gssapi.h>
+-#include <gssapi/gssapi_ext.h>
+ 
+ #include "gss_ntlmssp.h"
+ 
+--- gssntlmssp-0.7.0/src/gss_ntlmssp.h.orig	2016-05-23 17:33:43.684657463 +0200
++++ gssntlmssp-0.7.0/src/gss_ntlmssp.h	2019-03-11 19:33:23.667140370 +0100
+@@ -66,6 +66,23 @@
+ #define NTLMSSP_CTX_FLAG_SPNEGO_CAN_MIC 0x02 /* SPNEGO asks for MIC */
+ #define NTLMSSP_CTX_FLAG_AUTH_WITH_MIC  0x04 /* Auth MIC was created */
+ 
++/* MIT->heimdal compatibility */
++struct gss_key_value_element_struct {
++    const char *key;
++    const char *value;
++};
++typedef struct gss_key_value_element_struct gss_key_value_element_desc;
++
++struct gss_key_value_set_struct {
++    OM_uint32 count;
++    gss_key_value_element_desc *elements;
++};
++typedef struct gss_key_value_set_struct gss_key_value_set_desc;
++typedef const gss_key_value_set_desc *gss_const_key_value_set_t;
++
++#define GSS_C_NO_CRED_STORE ((gss_const_key_value_set_t) 0)
++/* END */
++
+ struct gssntlm_name {
+     enum ntlm_name_type {
+         GSSNTLM_NAME_NULL,
