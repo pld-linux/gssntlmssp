@@ -9,7 +9,7 @@ Summary:	GSSAPI NTLMSSP mechanism
 Summary(pl.UTF-8):	Mechanizm GSSAPI NTLMSSP
 Name:		gssntlmssp
 Version:	0.7.0
-Release:	1
+Release:	2
 License:	LGPL v3+
 Group:		Libraries
 # also https://github.com/simo5/gss-ntlmssp but no releases there
