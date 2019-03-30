@@ -9,7 +9,7 @@ Summary:	GSSAPI NTLMSSP mechanism
 Summary(pl.UTF-8):	Mechanizm GSSAPI NTLMSSP
 Name:		gssntlmssp
 Version:	0.7.0
-Release:	3
+Release:	4
 License:	LGPL v3+
 Group:		Libraries
 # also https://github.com/simo5/gss-ntlmssp but no releases there
@@ -108,6 +108,7 @@ fi
 %dir %{_libdir}/gssntlmssp
 %attr(755,root,root) %{_libdir}/gssntlmssp/gssntlmssp.so
 # TODO: needs to be owned by heimdal.spec?
+%dir /etc/gss
 %dir /etc/gss/mech.d
 /etc/gss/mech.d/ntlmssp.conf
 %{_mandir}/man8/gssntlmssp.8*
