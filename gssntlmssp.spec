@@ -8,15 +8,14 @@
 Summary:	GSSAPI NTLMSSP mechanism
 Summary(pl.UTF-8):	Mechanizm GSSAPI NTLMSSP
 Name:		gssntlmssp
-Version:	0.7.0
-Release:	5
+Version:	0.8.0
+Release:	1
 License:	LGPL v3+
 Group:		Libraries
 # also https://github.com/simo5/gss-ntlmssp but no releases there
-Source0:	http://releases.pagure.org/gssntlmssp/%{name}-%{version}.tar.gz
-# Source0-md5:	5f890092ecf8a566b7556fca2b60d6cc
+Source0:	https://releases.pagure.org/gssntlmssp/%{name}-%{version}.tar.gz
+# Source0-md5:	69b3b66519b8e2ce945675862029f816
 Patch0:		%{name}-heimdal.patch
-Patch1:		%{name}-openssl1.1.patch
 URL:		https://pagure.io/gssntlmssp
 BuildRequires:	autoconf >= 2.59
 BuildRequires:	automake >= 1:1.11
@@ -30,7 +29,7 @@ BuildRequires:	libtool >= 2:2
 BuildRequires:	libunistring-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	openssl-devel
-BuildRequires:	pkgconfig
+BuildRequires:	pkgconfig >= 1:0.9.0
 BuildRequires:	po4a
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -56,7 +55,6 @@ Plik nagłówkowy z definicjami rozszerzeń GSSAPI dla NTLMSSP.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__libtoolize}
